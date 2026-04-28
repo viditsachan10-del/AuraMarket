@@ -45,7 +45,7 @@ jobs:
       - name: Run contract tests
         run: |
           cd contracts/nft && cargo test
-          cd contracts/marketplace && cargo test
+          cd ../marketplace && cargo test
 
   build-frontend:
     runs-on: ubuntu-latest

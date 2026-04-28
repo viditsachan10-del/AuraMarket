@@ -16,7 +16,8 @@ import {
   buyNFT,
   listNFT,
   delistNFT,
-  transferNFT
+  transferNFT,
+  addNFTContractToFreighter
 } from "@/lib/contracts";
 import { 
   NFT_CONTRACT_ID, 
@@ -38,7 +39,32 @@ export default function AuraMarketPage() {
 
   const [isMinting, setIsMinting] = useState(false);
   const [isProcessing, setIsProcessing] = useState<string | null>(null); // NFT ID being processed
-  const [listingModalNFT, setListingModalNFT] = useState<NFTMetadata | null>(null);
+  const [listingModalNFT, setListingModalNFT] = useState<NFTMetadata & { id: bigint } | null>(null);
+  const [showCleanup, setShowCleanup] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && !localStorage.getItem("auramarket_legacy_cleanup_done")) {
+      setShowCleanup(true);
+    }
+  }, []);
+
+  const handleManualAddFreighter = async () => {
+    try {
+      await addNFTContractToFreighter();
+      addToast("success", `✦ NFT contract added to Freighter!`);
+    } catch (e: any) {
+      if (e.message === "COPIED_FALLBACK") {
+        addToast("success", `Contract ID copied! In Freighter: Menu → Manage Assets → Add → Paste`);
+      } else {
+        addToast("error", "Failed to add token to Freighter");
+      }
+    }
+  };
+
+  const dismissCleanup = () => {
+    localStorage.setItem("auramarket_legacy_cleanup_done", "true");
+    setShowCleanup(false);
+  };
   const [transferData, setTransferData] = useState({ id: "", recipient: "" });
 
   // ── Data Fetching (SWR) ────────────────────────────────────────────────────
@@ -271,7 +297,7 @@ export default function AuraMarketPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
             <MintForm 
-              onSuccess={() => mutateSupply()}
+              onSuccess={(_nftId: bigint) => mutateSupply()}
               walletAddress={address}
               onConnect={connect}
               isMinting={isMinting}
@@ -378,6 +404,34 @@ export default function AuraMarketPage() {
                     <span className="text-xl font-bold">{activeListings.filter(l => l.seller === address).length}</span>
                   </div>
                 </div>
+              </div>
+
+              {showCleanup && (
+                <div className="flex flex-col sm:flex-row items-center justify-between p-4 rounded-xl bg-aura-gold/10 border border-aura-gold/30 text-aura-gold">
+                  <div className="mb-4 sm:mb-0">
+                    <h4 className="font-bold text-sm mb-1">Legacy Token Cleanup</h4>
+                    <p className="text-xs opacity-80">
+                      If you hold old "NR..." tokens, please manually hide them in Freighter (Manage Assets → Hide). 
+                      AuraMarket NFTs are now fully native and managed under a single unified Contract ID.
+                    </p>
+                  </div>
+                  <button 
+                    onClick={dismissCleanup}
+                    className="shrink-0 px-4 py-2 border border-aura-gold/30 rounded-lg text-xs font-bold hover:bg-aura-gold/20 transition-colors"
+                  >
+                    Got it
+                  </button>
+                </div>
+              )}
+
+              <div className="flex justify-end">
+                <button
+                  onClick={handleManualAddFreighter}
+                  className="text-xs px-4 py-2 rounded-lg bg-bg-void border border-border-subtle hover:border-aura transition-colors flex items-center gap-2"
+                >
+                  <span className="text-aura">✦</span>
+                  Add AURA to Freighter
+                </button>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">

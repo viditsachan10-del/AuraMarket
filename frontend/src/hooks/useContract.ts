@@ -5,13 +5,11 @@ import {
   getTotalSupply,
   getActiveListings,
   getListing,
-  getNft,
-  getOwnerNfts,
-  fetchRecentEvents,
-  type NftMetadata,
+  getNFT,
+  getOwnerNFTs,
+  type NFTMetadata,
   type Listing,
-  type ContractEvent,
-} from "@/lib/stellar";
+} from "@/lib/contracts";
 
 // ── Total supply (poll every 10 s) ────────────────────────────────────────────
 
@@ -25,7 +23,7 @@ export function useTotalSupply() {
 // ── Active listings (poll every 8 s) ──────────────────────────────────────────
 
 export function useActiveListings() {
-  return useSWR<number[]>("active_listings", getActiveListings, {
+  return useSWR<bigint[]>("active_listings", getActiveListings, {
     refreshInterval: 8_000,
     revalidateOnFocus: true,
   });
@@ -33,7 +31,7 @@ export function useActiveListings() {
 
 // ── Single listing ────────────────────────────────────────────────────────────
 
-export function useListing(nftId: number | null) {
+export function useListing(nftId: bigint | null) {
   return useSWR<Listing | null>(
     nftId !== null ? `listing_${nftId}` : null,
     () => getListing(nftId!),
@@ -43,10 +41,10 @@ export function useListing(nftId: number | null) {
 
 // ── Single NFT metadata ───────────────────────────────────────────────────────
 
-export function useNft(id: number | null) {
-  return useSWR<NftMetadata | null>(
+export function useNft(id: bigint | null) {
+  return useSWR<NFTMetadata | null>(
     id !== null ? `nft_${id}` : null,
-    () => getNft(id!),
+    () => getNFT(id!),
     { refreshInterval: 15_000 }
   );
 }
@@ -54,18 +52,9 @@ export function useNft(id: number | null) {
 // ── Owner NFTs ────────────────────────────────────────────────────────────────
 
 export function useOwnerNfts(owner: string | null) {
-  return useSWR<number[]>(
+  return useSWR<bigint[]>(
     owner ? `owner_nfts_${owner}` : null,
-    () => getOwnerNfts(owner!),
+    () => getOwnerNFTs(owner!),
     { refreshInterval: 10_000, revalidateOnFocus: true }
   );
-}
-
-// ── Live event feed (poll every 5 s) ─────────────────────────────────────────
-
-export function useEventFeed() {
-  return useSWR<ContractEvent[]>("events", fetchRecentEvents, {
-    refreshInterval: 5_000,
-    revalidateOnFocus: true,
-  });
 }

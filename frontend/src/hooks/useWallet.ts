@@ -2,10 +2,11 @@
 
 import { useState, useCallback, useEffect } from "react";
 import {
-  getPublicKey,
+  getAddress,
   isConnected,
   getNetwork,
   signTransaction,
+  setAllowed,
 } from "@stellar/freighter-api";
 import {
   getServer,
@@ -33,14 +34,34 @@ export function useWallet() {
   const connect = useCallback(async () => {
     setState((s) => ({ ...s, isLoading: true, error: null }));
     try {
-      if (!(await isConnected())) {
-        throw new Error("Freighter wallet not found");
+      console.log("Checking Freighter connection...");
+      const connectedRes = await isConnected();
+      if (!connectedRes.isConnected) {
+        throw new Error("Freighter wallet not found. Please install the extension.");
       }
 
-      const address = await getPublicKey();
-      const network = await getNetwork();
+      console.log("Requesting access...");
+      // setAllowed() is the recommended way to trigger the "Access Request" popup
+      const isAllowedRes = await setAllowed();
+      if (!isAllowedRes.isAllowed) {
+        throw new Error("Access denied by user");
+      }
 
-      if (network.network !== "TESTNET") {
+      const addressRes = await getAddress();
+      if (addressRes.error) {
+        throw new Error(addressRes.error as string);
+      }
+      const address = addressRes.address;
+      console.log("Connected address:", address);
+      
+      const networkRes = await getNetwork();
+      if (networkRes.error) {
+        throw new Error(networkRes.error as string);
+      }
+      const network = networkRes.network;
+      console.log("Network:", network);
+
+      if (network !== "TESTNET") {
         throw new Error("Please switch Freighter to Testnet");
       }
 
@@ -48,10 +69,11 @@ export function useWallet() {
         address,
         isConnected: true,
         isLoading: false,
-        network: network.network,
+        network: network,
         error: null,
       });
     } catch (err: any) {
+      console.error("Wallet connection error:", err);
       setState((s) => ({
         ...s,
         isLoading: false,
@@ -94,8 +116,7 @@ export function useWallet() {
     const start = Date.now();
     
     while (
-      getResponse.status === SorobanRpc.Api.GetTransactionStatus.NOT_FOUND ||
-      getResponse.status === SorobanRpc.Api.GetTransactionStatus.PENDING
+      getResponse.status === SorobanRpc.Api.GetTransactionStatus.NOT_FOUND
     ) {
       if (Date.now() - start > 30000) throw new Error("Transaction timed out");
       await new Promise((r) => setTimeout(r, 2000));
@@ -111,16 +132,16 @@ export function useWallet() {
 
   // Initial check
   useEffect(() => {
-    isConnected().then((connected) => {
-      if (connected) {
-        getPublicKey().then((address) => {
-          if (address) {
-            getNetwork().then((net) => {
+    isConnected().then((connectedRes) => {
+      if (connectedRes.isConnected) {
+        getAddress().then((addressRes) => {
+          if (addressRes.address) {
+            getNetwork().then((netRes) => {
               setState({
-                address,
+                address: addressRes.address,
                 isConnected: true,
                 isLoading: false,
-                network: net.network,
+                network: netRes.network,
                 error: null,
               });
             });

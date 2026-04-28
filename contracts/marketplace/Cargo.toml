@@ -11,6 +11,9 @@ soroban-sdk = { version = "21.0.0", features = ["alloc"] }
 
 [dev-dependencies]
 soroban-sdk = { version = "21.0.0", features = ["testutils"] }
+auramarket-nft = { path = "../nft" }
+
+
 
 [profile.release]
 opt-level = "z"

@@ -4,13 +4,30 @@ import {
   rpc as SorobanRpc,
   nativeToScVal,
   scValToNative,
+  xdr,
 } from "@stellar/stellar-sdk";
 import {
-  getServer,
   NETWORK_PASSPHRASE,
   NFT_CONTRACT_ID,
   MARKETPLACE_CONTRACT_ID,
+  NATIVE_ASSET_CONTRACT,
+  getServer,
 } from "./stellar";
+
+// ── Freighter Integration ───────────────────────────────────────────────────
+
+export async function addNFTContractToFreighter(): Promise<void> {
+  const { addToken } = await import("@stellar/freighter-api");
+  if (typeof addToken === "function") {
+    await addToken({
+      contractId: NFT_CONTRACT_ID,
+      networkPassphrase: NETWORK_PASSPHRASE,
+    });
+  } else {
+    await navigator.clipboard.writeText(NFT_CONTRACT_ID);
+    throw new Error("COPIED_FALLBACK");
+  }
+}
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -34,6 +51,11 @@ export interface Listing {
 }
 
 // ── Internal Helpers ─────────────────────────────────────────────────────────
+
+/** Encode a JS string as a Soroban String ScVal (not Bytes). */
+function scvString(s: string): xdr.ScVal {
+  return xdr.ScVal.scvString(Buffer.from(s, "utf8"));
+}
 
 async function buildAndSimulate(
   sourceAddress: string,
@@ -73,9 +95,9 @@ export async function mintNFT(
 ): Promise<string> {
   return buildAndSimulate(to, NFT_CONTRACT_ID, "mint", [
     nativeToScVal(to, { type: "address" }),
-    nativeToScVal(name, { type: "string" }),
-    nativeToScVal(description, { type: "string" }),
-    nativeToScVal(imageUrl, { type: "string" }),
+    scvString(name),
+    scvString(description || ""),
+    scvString(imageUrl),
   ]);
 }
 
@@ -86,6 +108,7 @@ export async function transferNFT(
 ): Promise<string> {
   return buildAndSimulate(from, NFT_CONTRACT_ID, "transfer", [
     nativeToScVal(from, { type: "address" }),
+    nativeToScVal(from, { type: "address" }),
     nativeToScVal(to, { type: "address" }),
     nativeToScVal(nftId, { type: "u64" }),
   ]);
@@ -95,7 +118,7 @@ export async function getNFT(nftId: bigint): Promise<NFTMetadata> {
   const server = getServer();
   const contract = new Contract(NFT_CONTRACT_ID);
   const tx = new TransactionBuilder(
-    await server.getAccount("GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN"), // Placeholder for simulation
+    await server.getAccount("GB7I5LEIWEUYB2GECXYBBJ56TXGWP2SDVJFLZRHYUNVPCDADVA5VIY7Y"), // Placeholder for simulation
     {
       fee: "100",
       networkPassphrase: NETWORK_PASSPHRASE,
@@ -127,7 +150,7 @@ export async function getOwnerNFTs(owner: string): Promise<bigint[]> {
   const server = getServer();
   const contract = new Contract(NFT_CONTRACT_ID);
   const tx = new TransactionBuilder(
-    await server.getAccount("GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN"),
+    await server.getAccount("GB7I5LEIWEUYB2GECXYBBJ56TXGWP2SDVJFLZRHYUNVPCDADVA5VIY7Y"),
     { fee: "100", networkPassphrase: NETWORK_PASSPHRASE }
   )
     .addOperation(contract.call("get_owner_nfts", nativeToScVal(owner, { type: "address" })))
@@ -143,7 +166,7 @@ export async function getTotalSupply(): Promise<bigint> {
   const server = getServer();
   const contract = new Contract(NFT_CONTRACT_ID);
   const tx = new TransactionBuilder(
-    await server.getAccount("GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN"),
+    await server.getAccount("GB7I5LEIWEUYB2GECXYBBJ56TXGWP2SDVJFLZRHYUNVPCDADVA5VIY7Y"),
     { fee: "100", networkPassphrase: NETWORK_PASSPHRASE }
   )
     .addOperation(contract.call("total_supply"))
@@ -191,7 +214,7 @@ export async function getListing(nftId: bigint): Promise<Listing> {
   const server = getServer();
   const contract = new Contract(MARKETPLACE_CONTRACT_ID);
   const tx = new TransactionBuilder(
-    await server.getAccount("GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN"),
+    await server.getAccount("GB7I5LEIWEUYB2GECXYBBJ56TXGWP2SDVJFLZRHYUNVPCDADVA5VIY7Y"),
     { fee: "100", networkPassphrase: NETWORK_PASSPHRASE }
   )
     .addOperation(contract.call("get_listing", nativeToScVal(nftId, { type: "u64" })))
@@ -217,7 +240,7 @@ export async function getActiveListings(): Promise<bigint[]> {
   const server = getServer();
   const contract = new Contract(MARKETPLACE_CONTRACT_ID);
   const tx = new TransactionBuilder(
-    await server.getAccount("GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN"),
+    await server.getAccount("GB7I5LEIWEUYB2GECXYBBJ56TXGWP2SDVJFLZRHYUNVPCDADVA5VIY7Y"),
     { fee: "100", networkPassphrase: NETWORK_PASSPHRASE }
   )
     .addOperation(contract.call("get_active_listings"))

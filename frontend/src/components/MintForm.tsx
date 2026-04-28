@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useToast } from "./Toast";
-import { mintNFT } from "@/lib/contracts";
+import { mintNFT, getTotalSupply, addNFTContractToFreighter } from "@/lib/contracts";
 import { useWallet } from "@/hooks/useWallet";
 
 interface MintFormProps {
@@ -22,13 +22,12 @@ export default function MintForm({
 }: MintFormProps) {
   const { addToast } = useToast();
   const { signAndSubmit } = useWallet();
-  
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     imageUrl: "",
   });
-
   const [previewError, setPreviewError] = useState(false);
 
   const isFormValid = formData.name.length > 0 && formData.imageUrl.startsWith("https://");
@@ -41,6 +40,7 @@ export default function MintForm({
     }
 
     setIsMinting(true);
+
     try {
       const xdr = await mintNFT(
         walletAddress,
@@ -48,15 +48,23 @@ export default function MintForm({
         formData.description,
         formData.imageUrl
       );
-      
-      const hash = await signAndSubmit(xdr);
-      addToast("success", `Transaction confirmed! NFT minted.`);
-      
-      // In a real app, we'd parse the event to get the ID
-      // For now, we'll signal success to the parent
-      onSuccess(BigInt(0)); 
-      
+      await signAndSubmit(xdr);
+
+      // Fetch the latest total supply to know the newly minted NFT id
+      const newId = await getTotalSupply();
+
+      addToast("success", `✦ NFT minted successfully!`);
+      onSuccess(newId);
       setFormData({ name: "", description: "", imageUrl: "" });
+
+      try {
+        await addNFTContractToFreighter();
+        addToast("success", `✦ NFT contract added to Freighter!`);
+      } catch (e: any) {
+        if (e.message === "COPIED_FALLBACK") {
+          addToast("success", `Contract ID copied! In Freighter: Menu → Manage Assets → Add → Paste`);
+        }
+      }
     } catch (err: any) {
       addToast("error", err.message || "Failed to mint NFT");
     } finally {
@@ -158,7 +166,7 @@ export default function MintForm({
         </div>
 
         {/* Submit Section */}
-        <div className="pt-4 space-y-4">
+        <div className="pt-4 space-y-3">
           <button
             type="submit"
             disabled={isMinting || (walletAddress !== null && !isFormValid)}
@@ -178,9 +186,13 @@ export default function MintForm({
               </>
             )}
           </button>
-          <p className="text-center text-[10px] text-text-muted tracking-wide">
-            ESTIMATED NETWORK FEE: <span className="text-aura-gold">~0.01 XLM</span>
-          </p>
+
+          {!isMinting && (
+            <p className="text-center text-[10px] text-text-muted tracking-wide">
+              ESTIMATED NETWORK FEE:{" "}
+              <span className="text-aura-gold">~0.01 XLM</span>
+            </p>
+          )}
         </div>
       </form>
     </div>

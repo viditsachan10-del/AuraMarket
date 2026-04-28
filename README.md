@@ -11,7 +11,7 @@
 AuraMarket is a high-fidelity NFT platform that brings the "Dark Luxury" aesthetic to the Stellar network. It allows creators to mint unique digital assets with rich metadata and trade them in a decentralized marketplace. Built entirely on Soroban, it leverages inter-contract communication to ensure secure and verified peer-to-peer trading.
 
 ## Features
-- ✦ **Mint NFTs** on-chain with custom metadata and persistent artwork
+- ✦ **Mint NFTs:** Single-transaction minting with automatic native registration to Freighter Collectibles.
 - 🔄 **Inter-contract calls:** Marketplace verifies ownership and status via NFT contract
 - 🛒 **Marketplace:** Peer-to-peer listing and purchasing using XLM
 - 📊 **Real-time Activity:** Live protocol event feed polled directly from the blockchain
@@ -33,8 +33,8 @@ AuraMarket is a high-fidelity NFT platform that brings the "Dark Luxury" aesthet
 
 | Contract | Address | Description |
 |---|---|---|
-| NFT Contract | `CC4YDGOA7SMKUNSMDB2BK6XD25ALBYWK43WZUOSK6SAGKHSRUPT736OE` | Handles minting, ownership, and metadata |
-| Marketplace | `CBOVFUFZW73GIJ2FNKVNDA7ZQWTW4MLLIMVKKZGRL6EM7QPJSHBTQJS3` | Handles listing, buying, and fee distribution |
+| NFT Contract | `CCARXWBBRKC5UIO7DV6EUIJR2KVY3PK24KWXX2ARRJONTH5KCG3O6SEN` | SEP-41 compliant NFT minting, ownership, and metadata |
+| Marketplace | `CB32CA4O4HWESWP72SANXNVQVMBQ3E5ZNDKYXHNCCBEXO5DHULKBMEMF` | Handles listing, buying, and fee distribution |
 
 ### Inter-Contract Calls
 The Marketplace contract performs critical inter-contract operations with the NFT contract:
@@ -42,7 +42,7 @@ The Marketplace contract performs critical inter-contract operations with the NF
 2. `list_nft` → calls `nft.set_listed()` to prevent multiple listings
 3. `buy_nft` → calls `nft.transfer()` to execute secure ownership change
 
-**Deployment transaction hash:** `a24c14e12838f879c5cb22096a65e8023d126baaf1b9617f55aa3741d93fd004`
+**Deployment transaction hash (NFT):** `30caecab1bee9e3e8f74084c1cb71bf05d19a832a2b7eb4eb707f8df3e961764`
 
 ## Tech Stack
 - **Frontend:** Next.js 14 (App Router), TypeScript, Tailwind CSS, SWR

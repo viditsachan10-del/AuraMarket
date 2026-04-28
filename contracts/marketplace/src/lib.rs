@@ -14,6 +14,7 @@ use soroban_sdk::{
 pub enum DataKey {
     Admin,
     NftContract,
+    TokenAddress,
     ProtocolFee,
     Listing(u64),
     ActiveListings,
@@ -73,6 +74,7 @@ impl MarketplaceContract {
         env: Env,
         admin: Address,
         nft_contract: Address,
+        token_address: Address,
         fee_bps: u32,
     ) -> Result<(), MarketError> {
         if env.storage().instance().has(&DataKey::Admin) {
@@ -80,6 +82,7 @@ impl MarketplaceContract {
         }
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::NftContract, &nft_contract);
+        env.storage().instance().set(&DataKey::TokenAddress, &token_address);
         env.storage().instance().set(&DataKey::ProtocolFee, &fee_bps);
         env.storage().instance().set(&DataKey::ActiveListings, &Vec::<u64>::new(&env));
         env.storage().instance().extend_ttl(LEDGER_THRESHOLD, LEDGER_BUMP);
@@ -112,13 +115,13 @@ impl MarketplaceContract {
 
         // ── INTER-CONTRACT CALL 1: verify seller owns NFT ──────────────────
         let nft_client = nft_contract::Client::new(&env, &nft_contract_id);
-        let nft = nft_client.get_nft(&nft_id);
+        let nft = nft_client.get_nft(&nft_id).unwrap();
         if nft.owner != seller {
             return Err(MarketError::NotOwner);
         }
 
         // ── INTER-CONTRACT CALL 2: mark NFT as listed in NFT contract ──────
-        nft_client.set_listed(&seller, &nft_id, &true);
+        nft_client.set_listed(&env.current_contract_address(), &nft_id, &true);
 
         // Store listing
         let listing = Listing {
@@ -185,12 +188,18 @@ impl MarketplaceContract {
             .get(&DataKey::NftContract)
             .ok_or(MarketError::NotInitialized)?;
 
+        let token_address: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::TokenAddress)
+            .ok_or(MarketError::NotInitialized)?;
+
         // Calculate fee split
         let fee_amount = listing.price_xlm * (fee_bps as i128) / 10_000;
         let seller_amount = listing.price_xlm - fee_amount;
 
         // Native XLM token (Stellar asset contract)
-        let xlm_token = token::Client::new(&env, &env.current_contract_address());
+        let xlm_token = token::Client::new(&env, &token_address);
 
         // Transfer seller_amount → seller
         xlm_token.transfer(&buyer, &listing.seller, &seller_amount);
@@ -202,10 +211,10 @@ impl MarketplaceContract {
 
         // ── INTER-CONTRACT CALL 3: transfer NFT ownership ──────────────────
         let nft_client = nft_contract::Client::new(&env, &nft_contract_id);
-        nft_client.transfer(&listing.seller, &buyer, &nft_id);
+        nft_client.transfer(&env.current_contract_address(), &listing.seller, &buyer, &nft_id);
 
         // ── INTER-CONTRACT CALL 4: unmark listing in NFT contract ──────────
-        nft_client.set_listed(&listing.seller, &nft_id, &false);
+        nft_client.set_listed(&env.current_contract_address(), &nft_id, &false);
 
         // Mark listing inactive
         let mut updated = listing.clone();
@@ -329,6 +338,9 @@ impl MarketplaceContract {
         env.storage().instance().extend_ttl(LEDGER_THRESHOLD, LEDGER_BUMP);
     }
 }
+
+#[cfg(test)]
+mod test;
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 

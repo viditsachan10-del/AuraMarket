@@ -42,6 +42,10 @@ export default function Navbar() {
       const el = document.querySelector(link.href);
       if (el) observer.observe(el);
     });
+
+    return () => observer.disconnect();
+  }, []);
+
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
@@ -104,15 +108,31 @@ export default function Navbar() {
 
         {/* Right: Wallet & Mobile Toggle */}
         <div className="flex items-center gap-4">
+          {isConnected ? (
+            <div className="relative">
+              <button
+                onClick={() => setShowDropdown(!showDropdown)}
+                className="flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full hover:bg-white/10 transition-all"
+              >
+                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                <span className="font-['JetBrains_Mono'] text-[10px] tracking-tighter">
+                  {truncateAddress(address!)}
+                </span>
+              </button>
+
+              {showDropdown && (
+                <div className="absolute top-full right-0 mt-2 w-48 bg-[#0C0D14] border border-white/10 rounded-xl p-2 shadow-2xl z-[110]">
+                  <div className="px-4 py-2 border-b border-white/5 mb-2">
+                    <span className="block text-[10px] text-text-secondary uppercase tracking-widest mb-1">
                       Account
                     </span>
-                    <span className="font-['JetBrains_Mono'] text-xs text-primary break-all">
-                      {address}
+                    <span className="font-['JetBrains_Mono'] text-[10px] text-aura break-all">
+                      {truncateAddress(address!)}
                     </span>
                   </div>
                   <button
                     onClick={() => { disconnect(); setShowDropdown(false); }}
-                    className="w-full text-left px-4 py-2 text-xs uppercase tracking-widest text-red-400 hover:bg-white/5 rounded-lg transition-colors"
+                    className="w-full text-left px-4 py-2 text-[10px] uppercase tracking-widest text-red-400 hover:bg-white/5 rounded-lg transition-colors"
                   >
                     Disconnect
                   </button>
@@ -123,7 +143,7 @@ export default function Navbar() {
             <button
               onClick={connect}
               disabled={isLoading}
-              className="btn-aura"
+              className="bg-aura hover:bg-aura-light text-bg-main px-6 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest transition-all"
             >
               {isLoading ? "Connecting..." : "Connect Wallet"}
             </button>
@@ -132,9 +152,13 @@ export default function Navbar() {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-primary"
+            className="lg:hidden text-white"
           >
-            {isMobileMenuOpen ? "✕" : "☰"}
+            {isMobileMenuOpen ? (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            ) : (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+            )}
           </button>
         </div>
       </div>
@@ -144,17 +168,19 @@ export default function Navbar() {
         <div className="absolute top-full left-0 right-0 bg-bg-surface border-b border-border-aura animate-[fadeInDown_0.3s_ease-out] md:hidden">
           <div className="flex flex-col p-6 gap-6">
             {NAV_LINKS.map((link) => (
-              <a
+              <button
                 key={link.name}
-                href={link.href}
-                onClick={(e) => handleLinkClick(e, link.href)}
-                className="text-lg font-['Cormorant_Garamond'] tracking-widest text-text-secondary"
+                onClick={() => scrollTo(link.href.replace("#", ""))}
+                className="text-left text-lg font-['Cormorant_Garamond'] tracking-widest text-text-secondary hover:text-aura transition-colors"
               >
                 {link.name}
-              </a>
+              </button>
             ))}
             {!isConnected && (
-              <button onClick={connect} className="btn-aura w-full">
+              <button 
+                onClick={connect} 
+                className="bg-aura text-bg-main px-6 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all"
+              >
                 Connect Wallet
               </button>
             )}

@@ -39,6 +39,7 @@ dependencies = [
 name = "auramarket-marketplace"
 version = "0.1.0"
 dependencies = [
+ "auramarket-nft",
  "soroban-sdk",
 ]
 

@@ -1,0 +1,12 @@
+{
+  "name": "auramarket",
+  "version": "1.0.0",
+  "description": "NFT minting and marketplace on Stellar Soroban",
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "lint": "cd frontend && npm run lint",
+    "test:contracts": "cd contracts/nft && cargo test && cd ../marketplace && cargo test"
+  },
+  "license": "MIT"
+}

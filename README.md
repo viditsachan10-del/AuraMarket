@@ -2,7 +2,7 @@
 
 > NFT minting and peer-to-peer marketplace built on Stellar Soroban smart contracts.
 
-![CI](https://github.com/USERNAME/auramarket/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/viditsachan10-del/auramarket/actions/workflows/ci.yml/badge.svg)
 
 ## Live Demo
 🔗 [auramarket.vercel.app](https://auramarket.vercel.app)
@@ -57,7 +57,7 @@ Prerequisites: Node.js 20+, Rust, soroban-cli
 
 ```bash
 # Clone
-git clone https://github.com/USERNAME/auramarket
+git clone https://github.com/viditsachan10-del/auramarket
 cd auramarket
 
 # Frontend

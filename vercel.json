@@ -1,8 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm run build",
-  "outputDirectory": "frontend/.next",
-  "installCommand": "cd frontend && npm install",
+  "rootDirectory": "frontend",
   "framework": "nextjs",
   "env": {
     "NEXT_PUBLIC_NETWORK_PASSPHRASE": "Test SDF Network ; September 2015",

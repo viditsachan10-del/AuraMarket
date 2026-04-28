@@ -21,10 +21,10 @@ AuraMarket is a high-fidelity NFT platform that brings the "Dark Luxury" aesthet
 ## Screenshots
 
 ### Desktop View
-![Desktop View Placeholder](https://via.placeholder.com/1200x800?text=AuraMarket+Desktop+View)
+![Desktop View](frontend/public/screenshots/desktop.png)
 
 ### Mobile Responsive View  
-![Mobile View Placeholder](https://via.placeholder.com/400x800?text=AuraMarket+Mobile+View)
+![Mobile Responsive View](frontend/public/screenshots/mobile.png)
 
 ### CI/CD Pipeline
 ![CI Build Placeholder](https://via.placeholder.com/800x400?text=GitHub+Actions+Green+Build)

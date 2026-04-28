@@ -32,10 +32,15 @@ jobs:
 
 
       - name: Build NFT contract
-        run: cd contracts/nft && cargo build --target wasm32-unknown-unknown --release
+        run: |
+          cd contracts/nft
+          cargo build --target wasm32-unknown-unknown --release
+          cp ../../target/wasm32-unknown-unknown/release/auramarket_nft.wasm ../marketplace/nft.wasm
 
       - name: Build Marketplace contract
-        run: cd contracts/marketplace && cargo build --target wasm32-unknown-unknown --release
+        run: |
+          cd contracts/marketplace
+          cargo build --target wasm32-unknown-unknown --release
 
       - name: Run contract tests
         run: |

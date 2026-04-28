@@ -30,8 +30,6 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Install soroban-cli
-        run: cargo install --locked soroban-cli
 
       - name: Build NFT contract
         run: cd contracts/nft && cargo build --target wasm32-unknown-unknown --release

@@ -1,90 +1,36 @@
-# ✦ AuraMarket
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-> NFT minting and peer-to-peer marketplace built on Stellar Soroban smart contracts.
+## Getting Started
 
-![CI](https://github.com/viditsachan10-del/auramarket/actions/workflows/ci.yml/badge.svg)
-
-## Live Demo
-🔗 [auramarket.vercel.app](https://auramarket.vercel.app)
-
-## What is AuraMarket?
-AuraMarket is a high-fidelity NFT platform that brings the "Dark Luxury" aesthetic to the Stellar network. It allows creators to mint unique digital assets with rich metadata and trade them in a decentralized marketplace. Built entirely on Soroban, it leverages inter-contract communication to ensure secure and verified peer-to-peer trading.
-
-## Features
-- ✦ **Mint NFTs:** Single-transaction minting with automatic native registration to Freighter Collectibles.
-- 🔄 **Inter-contract calls:** Marketplace verifies ownership and status via NFT contract
-- 🛒 **Marketplace:** Peer-to-peer listing and purchasing using XLM
-- 📊 **Real-time Activity:** Live protocol event feed polled directly from the blockchain
-- 🔐 **Freighter Wallet:** Native Stellar authentication and transaction signing
-- 📱 **Mobile Responsive:** Elegant "Dark Luxury" UI optimized for all devices
-
-## Screenshots
-
-### Desktop View
-![Desktop View](frontend/public/screenshots/desktop.png)
-
-### Mobile Responsive View  
-![Mobile Responsive View](frontend/public/screenshots/mobile.png)
-
-### CI/CD Pipeline
-![CI Build Placeholder](https://via.placeholder.com/800x400?text=GitHub+Actions+Green+Build)
-
-## Smart Contracts (Stellar Testnet)
-
-| Contract | Address | Description |
-|---|---|---|
-| NFT Contract | `CCARXWBBRKC5UIO7DV6EUIJR2KVY3PK24KWXX2ARRJONTH5KCG3O6SEN` | SEP-41 compliant NFT minting, ownership, and metadata |
-| Marketplace | `CB32CA4O4HWESWP72SANXNVQVMBQ3E5ZNDKYXHNCCBEXO5DHULKBMEMF` | Handles listing, buying, and fee distribution |
-
-### Inter-Contract Calls
-The Marketplace contract performs critical inter-contract operations with the NFT contract:
-1. `list_nft` → calls `nft.get_nft()` to verify ownership before listing
-2. `list_nft` → calls `nft.set_listed()` to prevent multiple listings
-3. `buy_nft` → calls `nft.transfer()` to execute secure ownership change
-
-**Deployment transaction hash (NFT):** `30caecab1bee9e3e8f74084c1cb71bf05d19a832a2b7eb4eb707f8df3e961764`
-
-## Tech Stack
-- **Frontend:** Next.js 14 (App Router), TypeScript, Tailwind CSS, SWR
-- **Smart Contracts:** Rust, Soroban SDK 21.0.0
-- **Wallet:** Freighter API (@stellar/freighter-api)
-- **Network:** Stellar Testnet
-- **CI/CD:** GitHub Actions → Vercel
-
-## Local Development
-
-Prerequisites: Node.js 20+, Rust, soroban-cli
+First, run the development server:
 
 ```bash
-# Clone
-git clone https://github.com/viditsachan10-del/auramarket
-cd auramarket
-
-# Frontend
-cd frontend
-cp .env.example .env.local
-# Fill in contract addresses in .env.local
-npm install
 npm run dev
-
-# Build contracts
-cd contracts/nft
-cargo build --target wasm32-unknown-unknown --release
-
-cd ../marketplace  
-cargo build --target wasm32-unknown-unknown --release
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-## Environment Variables
-See `frontend/.env.example` for required variables.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## CI/CD
-GitHub Actions runs on every push:
-1. Builds both Rust contracts to WASM
-2. Runs contract unit tests
-3. Type-checks and lints frontend
-4. Builds Next.js production bundle
-5. Deploys to Vercel on merge to main
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## License
-MIT
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

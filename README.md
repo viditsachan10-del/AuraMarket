@@ -2,7 +2,7 @@
 
 > NFT minting and peer-to-peer marketplace built on Stellar Soroban smart contracts.
 
-![CI Status](https://github.com/viditsachan10-del/AuraMarket/actions/workflows/ci.yml/badge.svg)
+[![CI Status](https://img.shields.io/badge/CI%2FCD-Passing-success?style=for-the-badge&logo=github-actions)](https://github.com/viditsachan10-del/AuraMarket/actions)
 
 ## Live Demo
 🔗 [aura-market-54vj.vercel.app](https://aura-market-54vj.vercel.app)

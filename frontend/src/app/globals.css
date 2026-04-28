@@ -1,0 +1,170 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --aura: #E8A87C;
+  --aura-gold: #F4C842;
+  --aura-glow: rgba(232, 168, 124, 0.2);
+  --bg-void: #060608;
+  --bg-deep: #0C0D14;
+  --bg-surface: #131420;
+  --bg-card: rgba(255,255,255,0.04);
+  --bg-glass: rgba(12,13,20,0.85);
+  --border-subtle: rgba(255,255,255,0.07);
+  --border-aura: rgba(232,168,124,0.25);
+  --text-primary: #F5F0FF;
+  --text-secondary: rgba(245,240,255,0.55);
+  --text-muted: rgba(245,240,255,0.3);
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-void text-primary antialiased;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    @apply font-medium tracking-tight;
+  }
+}
+
+@layer components {
+  .glass-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-card:hover {
+    border-color: var(--border-aura);
+    background: rgba(255,255,255,0.06);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px -12px rgba(0,0,0,0.5);
+  }
+
+  .btn-aura {
+    background: linear-gradient(135deg, #E8A87C, #F4C842);
+    color: #060608;
+    font-weight: 700;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    @apply px-6 py-3 text-sm uppercase tracking-wider;
+  }
+
+  .btn-aura:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(232,168,124,0.4);
+    filter: brightness(1.1);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border-aura);
+    color: var(--aura);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    @apply px-6 py-3 text-sm uppercase tracking-wider;
+  }
+
+  .btn-ghost:hover {
+    background: rgba(232, 168, 124, 0.05);
+    border-color: var(--aura);
+    transform: translateY(-1px);
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(36px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, var(--bg-surface) 25%, rgba(232,168,124,0.08) 50%, var(--bg-surface) 75%);
+    background-size: 200%;
+    animation: shimmer 1.5s infinite;
+  }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes auraPulse {
+  0% { box-shadow: 0 0 0 0 rgba(232, 168, 124, 0.4); }
+  70% { box-shadow: 0 0 0 15px rgba(232, 168, 124, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(232, 168, 124, 0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+[data-delay="100"] { transition-delay: 0.1s; }
+[data-delay="200"] { transition-delay: 0.2s; }
+[data-delay="300"] { transition-delay: 0.3s; }
+[data-delay="400"] { transition-delay: 0.4s; }
+
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-aura-pulse { animation: auraPulse 2s infinite; }
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-aura);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--aura);
+}

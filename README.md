@@ -82,4 +82,4 @@ GitHub Actions runs on every push:
 4. Deploys to Vercel on merge to main
 
 ## License
-MIT
+MIT.
